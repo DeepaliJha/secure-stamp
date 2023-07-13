@@ -6,12 +6,35 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model User {
-    id String @id(uuid())
-    name String
-    email String
+  did   String   @id()
+  name  String
+  email String
+  docs  Schema[]
+}
+
+model Schema {
+  did         String      @id
+  title       String
+  description String
+  schemaDID   String
+  templateIds String[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  author      User?       @relation(fields: [authorId], references: [did])
+  authorId    String?
+  Templates   Templates[]
+}
+
+model Templates {
+  did         String  @id()
+  name        String
+  description String
+  schema      Schema? @relation(fields: [schemaId], references: [did])
+  schemaId    String?
 }
